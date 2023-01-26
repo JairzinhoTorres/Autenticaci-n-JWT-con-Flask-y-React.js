@@ -23,7 +23,7 @@ The following steps are automatically runned withing gitpod, if you are doing a 
 pipenv install;
 mysql -u root -e "CREATE DATABASE example";
 pipenv run init;
-pipenv run migrate;
+pipenv run upgradepipenv run upgradepipenv run upgrade;
 pipenv run upgrade;
 ```
 
