@@ -103,7 +103,7 @@ def get_info_planetas(planetas_id):
     return jsonify(planetas.serialize()), 200
 
 
-# # ---------------->>>>> ESTE ES EL GET DE UN  PLANETA <<<<<----------------
+# # ---------------->>>>> ESTE ES EL GET Favoritos <<<<<----------------
 @app.route('/user/<int:user_id>/favoritos/', methods=['GET'])
 def get_favoritos_user(user_id):
     
@@ -114,11 +114,15 @@ def get_favoritos_user(user_id):
 
 # # ---------------->>>>> ESTE ES EL POST DE UN  PLANETA <<<<<----------------
 @app.route('/todos', methods=['POST'])
-def add_new_todo():
-    request_body = request.json
-    print("Incoming request with the following body", request_body)
-    todos.append(request_body)
-    return jsonify(todos)
+def agregar_nuevo_planeta_favorito(user_id):
+    # consulta_planeta_favoritos=Favoritos.quety.filer_by()
+    # planetas_favoritos_user = User('admin', 'admin@example.com')    
+    # db.session.add(me)
+    # db.session.commit()
+    # request_body = request.json
+    # print("Incoming request with the following body", request_body)
+    # todos.append(request_body)
+    return jsonify({"msg":"funciona"})
 
 # this only runs if `$ python src/app.py` is executed
 
