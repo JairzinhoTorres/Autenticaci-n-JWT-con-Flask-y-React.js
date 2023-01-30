@@ -10,6 +10,10 @@ from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User,Personajes,Vehiculos,Planetas,Favoritos
 #from models import Person
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -25,6 +29,11 @@ MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
 setup_admin(app)
+
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+jwt = JWTManager(app)
+
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -137,6 +146,14 @@ def agregar_nuevo_personajes_favorito(user_id):
     user_personajes=Favoritos.query.filter_by(user_id=user_id).first()
     print(user_personajes)
     return jsonify(request_body),200
+        # # ---------------->>>>> ESTE ES EL POST DE UN  USUARIO <<<<<----------------
+@app.route('/signup', methods=['POST'])
+def add_new_user():
+    request_body = request.json
+    new_user = User(id=request_body["id"], nombre=request_body["name"], contraseña=request_body["password"],mail=request_body["email"])
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"msg": "El usuario "}),200
 
 # # ---------------->>>>> ESTE ES EL DELETE DE UN  PLANETA <<<<<----------------
 @app.route('/user/<int:user_id>/favoritos/planetas', methods=['DELETE'])
@@ -200,6 +217,35 @@ def eliminar_personajes_favorito(user_id):
 #     print(user_personajes)
 #     return jsonify(request_body),200
 
+
+        # # ---------------->>>>> ACA ESTA LA RUTA de login DESDE EL APP.ROUTE HASTA EL RETURN  <<<<<----------------
+
+@app.route("/login", methods=["POST"])
+def login():
+    correo = request.json.get("correo", None)
+    password = request.json.get("password", None)
+    user_tabla= User.query.filter_by(mail=correo,contraseña=password).first()
+    print(user_tabla)
+    if correo != user_tabla.mail or password != user_tabla.contraseña:
+        return jsonify({"msg": "Bad mail or password"}), 401
+
+    access_token = create_access_token(identity=correo)
+    return jsonify(access_token=access_token)
+
+
+        # # ---------------->>>>> Validacion del token  <<<<<----------------
+@app.route("/profile", methods=["GET"])
+@jwt_required()
+def protected():
+
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(mail=current_user).first()
+    response_body ={
+        "msg":"ok", 
+        "user":user.serialize()
+        }
+
+    return jsonify(response_body), 200
 
 # this only runs if `$ python src/app.py` is executed
 
